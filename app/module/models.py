@@ -28,7 +28,7 @@ class Users(db.Model):
     username = db.Column(db.String(45), unique=True)
     password = db.Column(db.String(200))
     emailId = db.Column(db.String(100))
-    divisionId = db.Column(db.Integer, db.ForeignKey('Division.divisionId'))
+    divisionId = db.Column(db.Integer)
     firstName = db.Column(db.String(100))
     lastName = db.Column(db.String(100))
 
@@ -47,13 +47,13 @@ class Jobs(db.Model):
 
     jobId = db.Column(db.Integer, primary_key=True)
     jobTitle = db.Column(db.String(100))
-    postedBy = db.Column(db.Integer, db.ForeignKey('Users.userId'))
+    postedBy = db.Column(db.Integer)
     isOpen = db.Column(db.Boolean)
     jobDescription = db.Column(db.String(10000))
     requirements = db.Column(db.String(1000))
     salary = db.Column(db.Integer)
     lastDateToApply = db.Column(db.Date)
-    divisionId = db.Column(db.Integer, db.ForeignKey('Division.divisionId'))
+    divisionId = db.Column(db.Integer)
 
     def __init__(self, jobTitle, postedBy, isOpen, jobDescription, requirements, salary, lastDateToApply, divisionId):
         self.jobTitle = jobTitle
