@@ -185,13 +185,13 @@ def addJobs():
     job = Jobs(jobTitle, postedBy, isOpen, jobDescription,
                requirements, salary, lastDateToApply, divisionId)
     db.session.add(job)
-    try:
-        db.session.commit()
-        return response("Job Added Successfully",
-                        HttpStatus.CREATED)
-    except Exception as e:
-        return response("Invalid Input Payload Supplied",
-                        HttpStatus.INTERNAL_SERVER_ERROR)
+    # try:
+    db.session.commit()
+    return response("Job Added Successfully",
+                    HttpStatus.CREATED)
+    # except Exception as e:
+    #     return response("Invalid Input Payload Supplied",
+    #                     HttpStatus.INTERNAL_SERVER_ERROR)
 
 
 @app.route("/jobs/delete/<jobId>", methods=['DELETE'])
