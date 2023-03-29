@@ -8,35 +8,7 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 
-
-# --------------------- WRAPPER CLASS FOR COOKIE-------------------------------
-
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        # token = None
-        # # jwt is passed in the request header
-        # if 'auth-token' in request.cookies:
-        #     token = request.cookies['auth-token']
-        # # return 401 if token is not passed
-        # if not token:
-        #     return response('Token is missing !!',
-        #                     HttpStatus.UNAUTHORIZED)
-        # try:
-        #     # decoding the payload to fetch the stored details
-        #     data = jwt.decode(
-        #         token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        #     current_user = Users.query.filter_by(userId=data['userId']).first()
-        # except:
-        #     return response('Auth Token is Invalid!',
-        #                     HttpStatus.UNAUTHORIZED)
-        # # returns the current logged in users contex to the routes
-        # return f(current_user, *args, **kwargs)
-        pass
-    return decorated
-
 # --------------------- HOME PAGE -------------------------
-
 
 @app.route("/")
 def home():
@@ -109,8 +81,7 @@ def deleteDivision(dcode):
 
 
 @app.route("/users", methods=['GET'])
-# @token_required
-def getUsers(current_user):
+def getUsers():
     users = Users.query.all()
     return make_response(users_schema.jsonify(users), HttpStatus.OK)
 
@@ -162,12 +133,10 @@ def loginUser():
 
 @app.route("/users/update/<username>", methods=['PUT'])
 # @token_required
-def updateUser(current_user, username):
+def updateUser(username):
     user = Users.query.filter(Users.username == username).first()
     if not user:
         return response("Username Not Found", HttpStatus.INTERNAL_SERVER_ERROR)
-    elif current_user.userId != user.userId:
-        return response('User not Authorized to update Information', HttpStatus.UNAUTHORIZED)
     else:
         username = request.json.get('username')
         emailId = request.json.get('emailId')
@@ -187,8 +156,7 @@ def updateUser(current_user, username):
 
 
 @app.route("/users/delete/<username>", methods=['DELETE'])
-# @token_required
-def deleteUser(current_user, username):
+def deleteUser(username):
     user = Users.query.filter(Users.username == username).first()
     if not user:
         return response("Username Not Found",
@@ -227,15 +195,11 @@ def addJobs():
 
 
 @app.route("/jobs/delete/<jobId>", methods=['DELETE'])
-# @token_required
-def deleteJob(current_user, jobId):
+def deleteJob(jobId):
     job = Jobs.query.filter(Jobs.jobId == jobId).first()
     if not job:
         return response("Job Not Found",
                         HttpStatus.INTERNAL_SERVER_ERROR)
-    elif current_user.userId != job.postedBy:
-        return response('User is Not Authorized to delete this job',
-                        HttpStatus.UNAUTHORIZED)
     else:
         db.session.delete(job)
         db.session.commit()
@@ -244,21 +208,16 @@ def deleteJob(current_user, jobId):
 
 
 @app.route("/jobs", methods=['GET'])
-# @token_required
-def getJobs(current_user):
+def getJobs():
     jobs = Jobs.query.all()
     return make_response(jobsSchema.jsonify(jobs), HttpStatus.OK)
 
 
 @app.route("/jobs/update/<jobId>", methods=['PUT'])
-# @token_required
-def updateJobs(current_user, jobId):
+def updateJobs(jobId):
     job = Jobs.query.filter(Jobs.jobId == jobId).first()
     if not job:
         return response("Job Not Found", HttpStatus.INTERNAL_SERVER_ERROR)
-    elif current_user.userId != job.postedBy:
-        return response('User is Not Authorized to delete this job',
-                        HttpStatus.UNAUTHORIZED)
     else:
         jobTitle = request.json.get('jobTitle')
         postedBy = request.json.get('postedBy')
@@ -283,7 +242,6 @@ def updateJobs(current_user, jobId):
 
 
 @app.route("/jobs/<jobId>", methods=['GET'])
-# @token_required
-def getJobById(jobId, current_user):
+def getJobById(jobId):
     job = Jobs.query.filter(Jobs.jobId == jobId).first()
     return make_response(jobSchema.jsonify(job), HttpStatus.OK)
